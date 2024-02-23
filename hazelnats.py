@@ -1,4 +1,5 @@
-## Some syntactic suggar on top of micro-nats
+## Some syntactic suggar on top of nats-micro
+##  See https://github.com/charbonnierg/nats-micro
 ##
 ## Allow declarative definition of services and endpoints like:
 ##  @service(name="calc")
