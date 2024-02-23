@@ -1,7 +1,6 @@
 """Minimal example of NATS micro usage with decorators."""
 
 import asyncio
-import contextlib
 import signal
 import os
 import sys
@@ -35,9 +34,12 @@ class SampleService:
     # request, response pattern, default behaviour
     @endpoint
     async def reply_one(self, req: Request):
-        await req.response(req.data())
+        data = req.data()
+        await req.respond(data)
 
     # reply will be handled automatically
+
+    @endpoint
     async def reply_two(self, req: Request):
         return req.data()
 
