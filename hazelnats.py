@@ -5,23 +5,23 @@
 ##  @service(name="calc")
 ##  class CalcService:
 ##      @endpoint
-##      def add(self, a, b):
+##      async def add(self, a, b):
 ##          return a + b
 ##
 ##  Services will be instantiated as singleton, as for now.
 ##
 ##  Parameters to endpoints will be converted if possible, like
 ##
-##      def echo_plain(self, req: Request):
+##      async def echo_plain(self, req: Request):
 ##          return req.data()
 ##
 ##      async def echo_plain_alt(self, req: Request):
 ##          await req.respond(req.data())
 ##
-##      def echo_json(self, data: dict):
+##      async def echo_json(self, data: dict):
 ##          return data
 ##
-##      def echo_args(self, a, b):
+##      async def echo_args(self, a, b):
 ##          return { 'a': a, 'b': b } 
 ##    
 import contextlib
@@ -29,6 +29,7 @@ import inspect
 import json
 
 from dataclasses import dataclass
+from fastapi.encoders import jsonable_encoder
 from nats.aio.client import Client
 import micro
 from micro import Request
@@ -119,8 +120,10 @@ class EndpointDefinition:
                     if isinstance(result, (int, float, bool)):
                         result = str(result)
                     else:
-                        # Convert object to json
-                        result = json.dumps(result)
+                        result = jsonable_encoder(result)
+
+                    # Convert object to json
+                    result = json.dumps(result)
 
                 # Convert stringify result to utf-8 bytes
                 result = result.encode("utf-8")
@@ -175,9 +178,12 @@ class EndpointDefinition:
         await self._convert_result(result, req)
 
 class ClientBuilder:
-    def __init__(self, servers=["nats://localhost:4222"]):
+    def __init__(self, servers=[]):
         self._servers = servers.split(',') if isinstance(servers, str) else servers
-
+        
+        if not self._servers:
+            self._servers.append("nats://localhost:4222")
+            
     async def run(self, quit_event):
         async with contextlib.AsyncExitStack() as stack:
             nc = Client()

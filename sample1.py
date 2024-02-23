@@ -64,5 +64,4 @@ class CalcService:
         return { 'result': a + b }
     
 if __name__ == "__main__":
-    nats_server = sys.argv[1] if len(sys.argv) > 1 else "nats://localhost:4222"
-    asyncio.run(main(nats_server))
+    asyncio.run(main(sys.argv[1:]))
