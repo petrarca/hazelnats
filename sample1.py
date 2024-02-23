@@ -58,7 +58,6 @@ class SampleService:
 @service(name="calc")
 class CalcService:
     @endpoint(name = "add")
-#    async def add(self, req: Request):
     async def add(self, a, b):
         return { 'result': a + b }
     
